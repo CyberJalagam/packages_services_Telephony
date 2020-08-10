@@ -1553,6 +1553,74 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
         }
     }
 
+    public void toggle2G(boolean on) {
+        int network = -1;
+        final int phoneSubId = mSubscriptionController.getDefaultDataSubId();
+        Phone aphone = getPhone(phoneSubId);
+
+        if (on) {
+            if(phoneSubId != 0) {
+                pNetwork = android.provider.Settings.Global.getInt(mApp.getContentResolver(),
+                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId, 0);
+            } else {
+                pNetwork = android.provider.Settings.Global.getInt(mApp.getContentResolver(),
+                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE, 0);
+            }
+            network = TelephonyManager.NETWORK_MODE_GSM_ONLY;
+        } else {
+            network = pNetwork;
+        }
+
+        aphone.setPreferredNetworkType(network,
+                mMainThreadHandler.obtainMessage(CMD_TOGGLE_2G));
+        if(phoneSubId != 0) {
+            android.provider.Settings.Global.putInt(mApp.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId, network);
+        } else {
+            android.provider.Settings.Global.putInt(mApp.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE, network);
+        }
+
+        log("DefaultSubId: " + phoneSubId);
+        log("NetworkType: " + network);
+    }
+
+    public void toggle3G(boolean on) {
+        int network = -1;
+        final int phoneSubId = mSubscriptionController.getDefaultDataSubId();
+        Phone aphone = getPhone(phoneSubId);
+
+        if (on) {
+            if(phoneSubId != 0) {
+                pNetwork = android.provider.Settings.Global.getInt(mApp.getContentResolver(),
+                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId, 0);
+            } else {
+                pNetwork = android.provider.Settings.Global.getInt(mApp.getContentResolver(),
+                    android.provider.Settings.Global.PREFERRED_NETWORK_MODE, 0);
+            }
+            network = TelephonyManager.NETWORK_MODE_GSM_UMTS;
+        } else {            
+            try {
+              network = TelephonyManager.NETWORK_MODE_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA;
+            } catch (Exception e) {
+              network = pNetwork;
+            }
+        }
+
+        aphone.setPreferredNetworkType(network,
+                mMainThreadHandler.obtainMessage(CMD_TOGGLE_3G));
+        if(phoneSubId != 0) {
+            android.provider.Settings.Global.putInt(mApp.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE + phoneSubId, network);
+        } else {
+            android.provider.Settings.Global.putInt(mApp.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE, network);
+        }
+
+        log("DefaultSubId: " + phoneSubId);
+        log("NetworkType: " + network);
+    }
+
     public boolean supplyPin(String pin) {
         return supplyPinForSubscriber(getDefaultSubscription(), pin);
     }
