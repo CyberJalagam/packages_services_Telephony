@@ -1568,7 +1568,11 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
             }
             network = TelephonyManager.NETWORK_MODE_GSM_ONLY;
         } else {
-            network = pNetwork;
+            try {
+              network = TelephonyManager.NETWORK_MODE_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA;
+            } catch (Exception e) {
+              network = pNetwork;
+            }
         }
 
         aphone.setPreferredNetworkType(network,
